@@ -1,0 +1,55 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: spire
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-3"
+spec:
+  project: default
+  source:
+    chart: spire
+    repoURL: https://spiffe.github.io/helm-charts-hardened/
+    targetRevision: 0.1.0
+    helm:
+      values: |
+        server:
+          dataStorage:
+            enabled: true
+            storageClass: "openebs-hostpath" # k0s bundled storage or similar
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: spire
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: linkerd
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+spec:
+  project: default
+  source:
+    chart: linkerd-control-plane
+    repoURL: https://helm.linkerd.io/stable
+    targetRevision: 1.16.11
+    helm:
+      parameters:
+        - name: identityTrustAnchorsPEM
+          value: "PLACEHOLDER_CA" # User must replace or use a secret reference
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: linkerd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

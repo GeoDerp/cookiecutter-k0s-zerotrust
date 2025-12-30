@@ -1,0 +1,9 @@
+{
+  "project_name": "K0s Zero Trust Platform",
+  "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-') }}",
+  "domain": "cluster.local",
+  "k0s_version": "v1.28.4+k0s.0",
+  "argocd_version": "stable",
+  "admin_email": "admin@example.com",
+  "github_username": "myorg"
+}
